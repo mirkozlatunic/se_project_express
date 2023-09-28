@@ -3,10 +3,10 @@ const { OK, CREATED } = require("../utils/errors");
 const { handleHttpError } = require("../utils/errorHandlers");
 
 const createItem = (req, res) => {
-    const {name, weather, imageURL} = req.body;
-    const owner = req.user._id
+    const {name, weather, imageUrl} = req.body;
+    const owner = req.user._id;
 
-    ClothingItem.create({name, weather, imageURL, owner}).then((item) => {
+    ClothingItem.create({name, weather, imageUrl, owner}).then((item) => {
         res.status(CREATED).send({data:item})
     }). catch((e) => {
         handleHttpError(req, res, e);
@@ -18,14 +18,6 @@ const getItems = (req, res) => {
     .catch((e) => {
         handleHttpError(req, res, e);
     })
-}
-
-const updateItem = (req, res) => {
-    const {itemId} = req.params;
-    const {imageURL} = req.body;
-
-    ClothingItem.findByIdAndUpdate(itemId, {$set: {imageURL}}).orFail().then((item) => res.status(200).send({data:item})).catch((e) => {
-        handleHttpError(req, res, e)})
 }
 
 const deleteItem = (req, res) => {
@@ -49,4 +41,4 @@ const dislikeItem = (req, res) => {
         handleHttpError(req, res, e)})
 }
 
-module.exports = {createItem, getItems, updateItem, deleteItem, likeItem, dislikeItem}
+module.exports = {createItem, getItems, deleteItem, likeItem, dislikeItem}

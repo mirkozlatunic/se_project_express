@@ -4,24 +4,20 @@ module.exports = {
         "commonjs": true,
         "es2021": true
     },
-    "overrides": [
-        {
-            "env": {
-                "node": true
-            },
-            "files": [
-                ".eslintrc.{js,cjs}"
-            ],
-            "parserOptions": {
-                "sourceType": "script"
-            }
-        }
-    ],
     extends: ["eslint:recommended", "airbnb-base", "prettier"],
-  overrides: [],
-    "parserOptions": {
-        "ecmaVersion": "latest"
+    overrides: [
+      {
+        env: {
+          node: true,
+        },
+        files: [".eslintrc.{js,cjs}"],
+        parserOptions: {
+          sourceType: "script",
+        },
+      },
+    ],
+    parserOptions: {
+      ecmaVersion: "latest",
     },
-    "rules": {
-    }
-}
+    rules: { "no-underscore-dangle": "off" },
+  };

@@ -13,7 +13,7 @@ const clothingItem = new mongoose.Schema({
         required: true,
         enum: ['hot', 'warm', 'cold']
     },
-    imageURL: {
+    imageUrl: {
         type: String,
         required: true,
         validate: {
@@ -23,7 +23,7 @@ const clothingItem = new mongoose.Schema({
             message: 'You must enter a valid URL',
           }
     },
-    onwer: {
+    owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'user',
