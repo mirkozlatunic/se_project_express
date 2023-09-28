@@ -47,4 +47,6 @@ Before committing your code, make sure you edit the file `sprint.txt` in the roo
 
 # GitHub Page
 
+- [Link to the Github Page](https://mirkozlatunic.github.io/se_project_express/)
+
 **Created By [Mirko Zlatunic](https://github.com/mirkozlatunic)**
