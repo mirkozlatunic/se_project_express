@@ -39,19 +39,21 @@ const createUser = (req, res) => {
     })
     .then(() => {
       return bcrypt.hash(password, 10).then((hash) => {
-        User.create({ name, avatar, email, password: hash }).then((user) => {
-          res
-            .status(CREATED)
-            .send({
+        User.create({ name, avatar, email, password: hash })
+          .then((user) => {
+            res.status(CREATED).send({
               name: user.name,
               email: user.email,
               avatar: user.avatar,
-            })
-            .catch((e) => {
-              handleHttpError(req, res, e);
             });
-        });
+          })
+          .catch((e) => {
+            handleHttpError(req, res, e);
+          });
       });
+    })
+    .catch((e) => {
+      handleHttpError(req, res, e);
     });
 };
 
