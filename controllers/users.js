@@ -29,31 +29,29 @@ const createUser = (req, res) => {
     res.status(400).send({ message: "Please inlcude an email" });
   }
 
-  User.findOne({ email }).then((user) => {
-    if (user) {
-      const error = new Error("a user with that email already exists.");
-      error.statusCode = 409;
-      return Promise.reject(error);
-    }
-  });
-
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => {
-      User.create({ name, avatar, email, password: hash })
-        .then((user) => {
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        const error = new Error("a user with that email already exists.");
+        error.statusCode = 409;
+        return Promise.reject(error);
+      }
+    })
+    .then(() => {
+      return bcrypt.hash(password, 10).then((hash) => {
+        User.create({ name, avatar, email, password: hash }).then((user) => {
           res
             .status(CREATED)
-            .send({ name: user.name, email: user.email, avatar: user.avatar });
-        })
-        .catch((e) => {
-          handleHttpError(req, res, e);
+            .send({
+              name: user.name,
+              email: user.email,
+              avatar: user.avatar,
+            })
+            .catch((e) => {
+              handleHttpError(req, res, e);
+            });
         });
-    })
-    .catch((e) => {
-      res
-        .status(e.statusCode || 500)
-        .send({ message: e.message || "Internal server error" });
+      });
     });
 };
 
