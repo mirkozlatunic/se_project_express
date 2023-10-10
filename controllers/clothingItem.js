@@ -43,7 +43,7 @@ const deleteItem = (req, res) => {
       }
     })
     .catch((e) => {
-      handleItemHttpError(req, res, e);
+      handleHttpError(req, res, e);
     });
 };
 

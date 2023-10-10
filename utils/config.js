@@ -1,5 +1,5 @@
-const JWT_SECRET = "Javascript2023";
+const SECRET_KEY = "JWT_SECRET";
 
 module.exports = {
-  JWT_SECRET,
+  SECRET_KEY,
 };
