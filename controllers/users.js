@@ -1,17 +1,18 @@
-const User = require("../models/user");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const User = require("../models/user");
 const { handleHttpError } = require("../utils/errorHandlers");
 const { OK, UNAUTHORIZED, CREATED } = require("../utils/errors");
+const { SECRET_KEY } = require("../utils/errors");
 
 const login = (req, res) => {
   const { email, password } = req.body;
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
         return Promise.reject(new Error("incorrect username or password"));
       }
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+      const token = jwt.sign({ _id: user._id }, SECRET_KEY, {
         expiresIn: "7d",
       });
 
@@ -26,7 +27,8 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email) {
-    res.status(400).send({ message: "Please inlcude an email" });
+    res.status(400).send({ message: "Please include an email" });
+    return;
   }
 
   User.findOne({ email })
@@ -36,24 +38,26 @@ const createUser = (req, res) => {
         error.statusCode = 409;
         return Promise.reject(error);
       }
-    })
-    .then(() => {
-      return bcrypt.hash(password, 10).then((hash) => {
+
+      bcrypt.hash(password, 10).then((hash) => {
         User.create({ name, avatar, email, password: hash })
-          .then((user) => {
+          .then((newUser) => {
             res.status(CREATED).send({
-              name: user.name,
-              email: user.email,
-              avatar: user.avatar,
+              name: newUser.name,
+              email: newUser.email,
+              avatar: newUser.avatar,
             });
           })
-          .catch((e) => {
-            handleHttpError(req, res, e);
+          .catch((err) => {
+            handleHttpError(req, res, err);
           });
       });
     })
-    .catch((e) => {
-      handleHttpError(req, res, e);
+    .catch((err) => {
+      console.error(err);
+      res
+        .status(err.statusCode || 500)
+        .send({ message: err.message || "Internal server error" });
     });
 };
 
@@ -99,7 +103,7 @@ const updateProfile = (req, res) => {
       res.status(OK).send({ user });
     })
     .catch((e) => {
-      handleUserHttpError(req, res, e);
+      handleHttpError(req, res, e);
     });
 };
 

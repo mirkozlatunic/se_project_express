@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 2,
-    maxlenght: 30,
+    maxlength: 30,
   },
   avatar: {
     type: String,
@@ -25,9 +25,21 @@ const userSchema = new mongoose.Schema({
     required: true,
     select: false,
   },
+  email: {
+    type: String,
+    require: true,
+    unique: true,
+    validator(value) {
+      return validator.isURL(value);
+    },
+    message: "email is invalid or already exists",
+  },
 });
 
-userSchema.statics.findUserByCredentials = function (email, password) {
+userSchema.statics.findUserByCredentials = function findUserByCredentials(
+  email,
+  password,
+) {
   return this.findOne({ email })
     .select("+password")
     .then((user) => {
