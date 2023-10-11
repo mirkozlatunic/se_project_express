@@ -63,27 +63,6 @@ const createUser = (req, res) => {
     });
 };
 
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => {
-      res.status(OK).send(users);
-    })
-    .catch((e) => {
-      handleHttpError(req, res, e);
-    });
-};
-
-const getUser = (req, res) => {
-  User.findById(req.params.id)
-    .orFail()
-    .then((user) => {
-      res.status(OK).send(user);
-    })
-    .catch((e) => {
-      handleHttpError(req, res, e);
-    });
-};
-
 const getCurrentUser = (req, res) => {
   User.findById(req.user._id)
     .orFail()
@@ -96,23 +75,24 @@ const getCurrentUser = (req, res) => {
 };
 
 const updateProfile = (req, res) => {
-  User.findOneAndUpdate(req.user._id, req.body, {
-    new: true,
-    runValidators: true,
-  })
-    .orFail()
+  const { name, avatar } = req.body;
+  const userId = req.user._id;
+
+  User.findByIdAndUpdate(
+    userId,
+    { name, avatar },
+    { new: true, runValidators: true },
+  )
     .then((user) => {
-      res.status(OK).send({ user });
+      res.send({ data: user });
     })
-    .catch((e) => {
-      handleHttpError(req, res, e);
+    .catch((err) => {
+      handleHttpError(req, res, err);
     });
 };
 
 module.exports = {
   createUser,
-  getUsers,
-  getUser,
   login,
   getCurrentUser,
   updateProfile,
