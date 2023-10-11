@@ -18,6 +18,7 @@ mongoose.connect(
 
 const routes = require("./routes");
 
+app.use(helmet());
 app.use(express.json());
 app.use((req, res, next) => {
   req.user = {
@@ -26,7 +27,6 @@ app.use((req, res, next) => {
   next();
 });
 app.use(routes);
-app.use(helmet());
 app.use(cors());
 
 app.listen(PORT, () => {

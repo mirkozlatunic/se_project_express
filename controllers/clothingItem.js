@@ -1,6 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
-const { OK, CREATED } = require("../utils/errors");
-const { handleHttpError } = require("../utils/errorHandlers");
+const { OK, CREATED, FORBIDDEN, handleHttpError } = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -25,25 +24,24 @@ const getItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
+  const userId = req.user._id;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
       console.log(item);
-      if (item.owner.equals(req.user._id)) {
-        item.deleteOne();
-        res.send(item);
-        return;
-      } else {
-        const error = new Error();
-        error.status = 403;
-        error.name = "Forbidden";
-        error.message = "Can only delete own cards";
-        throw error;
+      if (userId !== item.owner.toString()) {
+        return res.status(FORBIDDEN).send({ message: "Access denied" });
       }
+      return ClothingItem.findByIdAndRemove(itemId)
+        .orFail()
+        .then((removedItem) => res.send(removedItem))
+        .catch((err) => {
+          handleHttpError(req, res, err);
+        });
     })
-    .catch((e) => {
-      handleHttpError(req, res, e);
+    .catch((err) => {
+      handleHttpError(req, res, err);
     });
 };
 
