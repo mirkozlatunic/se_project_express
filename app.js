@@ -15,6 +15,7 @@ mongoose.connect(
   },
   (e) => console.log("DB error", e),
 );
+app.use(cors());
 
 const routes = require("./routes");
 
@@ -26,8 +27,8 @@ app.use((req, res, next) => {
   };
   next();
 });
+
 app.use(routes);
-app.use(cors());
 
 app.listen(PORT, () => {
   console.log(`App listening at port ${PORT}`);
