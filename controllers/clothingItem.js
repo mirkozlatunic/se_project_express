@@ -2,10 +2,10 @@ const ClothingItem = require("../models/clothingItem");
 const { OK, CREATED, FORBIDDEN, handleHttpError } = require("../utils/errors");
 
 const createItem = (req, res) => {
-  const { name, weatherType, link } = req.body;
+  const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
 
-  ClothingItem.create({ name, weatherType, link, owner })
+  ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
       res.status(CREATED).send({ data: item });
     })
@@ -29,7 +29,6 @@ const deleteItem = (req, res) => {
   ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
-      console.log(item);
       if (userId !== item.owner.toString()) {
         return res.status(FORBIDDEN).send({ message: "Access denied" });
       }
