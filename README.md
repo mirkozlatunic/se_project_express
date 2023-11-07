@@ -45,8 +45,8 @@ to refresh itself whenever source code is changed.
 
 Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
 
-# GitHub Page
+## Frontend Repository Link:
 
-- [Link to the Github Page](https://mirkozlatunic.github.io/se_project_express/)
+- [Backend Repository Link](https://github.com/mirkozlatunic/se_project_react)
 
 **Created By [Mirko Zlatunic](https://github.com/mirkozlatunic)**
