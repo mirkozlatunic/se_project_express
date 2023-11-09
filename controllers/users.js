@@ -1,15 +1,20 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
-const {
-  UNAUTHORIZED,
-  CREATED,
-  BAD_REQUEST,
-  FORBIDDEN,
-  OK,
-  handleHttpError,
-} = require("../utils/errors");
+// const {
+//   UNAUTHORIZED,
+//   CREATED,
+//   BAD_REQUEST,
+//   FORBIDDEN,
+//   OK,
+//   handleHttpError,
+// } = require("../utils/errors");
 const { SECRET_KEY } = require("../utils/config");
+const BadRequestError = require("../utils/bad-request-error");
+const ConflictError = require("../utils/conflict-error");
+// const ForbiddenError = require("../utils/forbidden-error");
+const NotFoundError = require("../utils/not-found-error");
+const UnauthorizedError = require("../utils/unauthorized-error");
 
 const login = (req, res) => {
   const { email, password } = req.body;
@@ -21,8 +26,8 @@ const login = (req, res) => {
 
       res.send({ token });
     })
-    .catch((e) => {
-      res.status(UNAUTHORIZED).send({ message: e.message });
+    .catch(() => {
+      next(new UnauthorizedError("Error from signinUser"));
     });
 };
 
@@ -30,36 +35,36 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email) {
-    res.status(BAD_REQUEST).send({ message: "Please include an email" });
+    next(new BadRequestError("Error from createUser"));
   }
 
   User.findOne({ email })
     .then((user) => {
       if (user) {
-        return res
-          .status(FORBIDDEN)
-          .send({ message: "a user with that email already exists." });
+        return next(new ConflictError("Email already exists"));
       }
 
       return bcrypt.hash(password, 10).then((hash) => {
         User.create({ name, avatar, email, password: hash })
           .then((newUser) => {
-            res.status(CREATED).send({
+            res.status(200).send({
               name: newUser.name,
               email: newUser.email,
               avatar: newUser.avatar,
             });
           })
           .catch((err) => {
-            handleHttpError(req, res, err);
+            console.error(err);
+            if (err.name === "ValidationError") {
+              next(new BadRequestError("Error from createUser"));
+            } else {
+              next(e);
+            }
           });
       });
     })
-    .catch((err) => {
-      console.error(err);
-      res
-        .status(err.statusCode || 500)
-        .send({ message: err.message || "Internal server error" });
+    .catch((e) => {
+      next(e);
     });
 };
 
@@ -67,10 +72,16 @@ const getCurrentUser = (req, res) => {
   User.findById(req.user._id)
     .orFail()
     .then((user) => {
-      res.status(OK).send(user);
+      res.status(200).send(user);
     })
     .catch((e) => {
-      handleHttpError(req, res, e);
+      if (e.name === "DocumentNotFoundError") {
+        next(new NotFoundError("Error from getUser"));
+      } else if (e.name === "CastError") {
+        next(new BadRequestError("Error from getUser"));
+      } else {
+        next(e);
+      }
     });
 };
 
@@ -86,8 +97,14 @@ const updateProfile = (req, res) => {
     .then((user) => {
       res.send({ data: user });
     })
-    .catch((err) => {
-      handleHttpError(req, res, err);
+    .catch((e) => {
+      if (e.name === "DocumentNotFoundError") {
+        next(new NotFoundError("Error from getUser"));
+      } else if (e.name === "CastError") {
+        next(new BadRequestError("Error from getUser"));
+      } else {
+        next(e);
+      }
     });
 };
 
