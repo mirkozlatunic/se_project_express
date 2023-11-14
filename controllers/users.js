@@ -16,7 +16,7 @@ const ConflictError = require("../utils/conflict-error");
 const NotFoundError = require("../utils/not-found-error");
 const UnauthorizedError = require("../utils/unauthorized-error");
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -31,7 +31,7 @@ const login = (req, res) => {
     });
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email) {
@@ -53,9 +53,9 @@ const createUser = (req, res) => {
               avatar: newUser.avatar,
             });
           })
-          .catch((err) => {
-            console.error(err);
-            if (err.name === "ValidationError") {
+          .catch((e) => {
+            console.error(e);
+            if (e.name === "ValidationError") {
               next(new BadRequestError("Error from createUser"));
             } else {
               next(e);
@@ -68,7 +68,7 @@ const createUser = (req, res) => {
     });
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .orFail()
     .then((user) => {
@@ -85,7 +85,7 @@ const getCurrentUser = (req, res) => {
     });
 };
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { name, avatar } = req.body;
   const userId = req.user._id;
 
@@ -102,6 +102,8 @@ const updateProfile = (req, res) => {
         next(new NotFoundError("Error from getUser"));
       } else if (e.name === "CastError") {
         next(new BadRequestError("Error from getUser"));
+      } else if (e.name === "ValdiationError") {
+        next(new BadRequestError("invalid data"));
       } else {
         next(e);
       }

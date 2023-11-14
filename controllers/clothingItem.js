@@ -6,7 +6,7 @@ const ForbiddenError = require("../utils/forbidden-error");
 const NotFoundError = require("../utils/not-found-error");
 // const UnauthorizedError = require("../utils/unauthorized-error");
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
 
@@ -23,7 +23,7 @@ const createItem = (req, res) => {
     });
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
     .catch((e) => {
@@ -31,7 +31,7 @@ const getItems = (req, res) => {
     });
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
@@ -58,7 +58,7 @@ const deleteItem = (req, res) => {
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   const { itemId } = req.params;
 
   ClothingItem.findByIdAndUpdate(
@@ -81,7 +81,7 @@ const likeItem = (req, res) => {
     });
 };
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   const { itemId } = req.params;
 
   ClothingItem.findByIdAndUpdate(
@@ -91,7 +91,7 @@ const dislikeItem = (req, res) => {
   )
     .orFail()
     .then((dislike) => {
-      res.status(200).send(dislike);
+      res.send(dislike);
     })
     .catch((e) => {
       if (e.name === "DocumentNotFoundError") {
