@@ -10,7 +10,7 @@ const validateURL = (value, helpers) => {
 };
 
 // Validate clothing item body when and item is created
-module.exports.validateCardBody = celebrate({
+module.exports.validateUserBody = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30).message({
       "string.min": 'The minimum length of the "name" field is 2',

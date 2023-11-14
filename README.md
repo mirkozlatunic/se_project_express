@@ -49,8 +49,9 @@ Before committing your code, make sure you edit the file `sprint.txt` in the roo
 
 - [Frontend Repository Link](https://github.com/mirkozlatunic/se_project_react)
 
-## Domain Link:
+## Domain Name:
 
-- [Domain Link](https://hwpo-hstl.jumpingcrab.com)
+- [Domain Name](hwpo-hstl.jumpingcrab.com, www.hwpo-hstl.jumpingcrab.com)
+- [Domain Link](api.hwpo-hstl.jumpingcrab.com)
 
 **Created By [Mirko Zlatunic](https://github.com/mirkozlatunic)**
