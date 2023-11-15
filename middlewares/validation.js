@@ -40,7 +40,7 @@ module.exports.validateUserLogin = celebrate({
 
 // Validate user and clothing item IDs when they are accessed
 module.exports.validateId = celebrate({
-  params: Joi.object().keys()({
+  params: Joi.object().keys({
     itemId: Joi.string().hex().length(24),
   }),
 });

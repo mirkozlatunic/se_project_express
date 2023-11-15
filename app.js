@@ -17,7 +17,7 @@ mongoose.connect(
   },
   (e) => console.log("DB error", e),
 );
-
+app.use(cors());
 app.use(express.json());
 const routes = require("./routes");
 
@@ -32,7 +32,6 @@ app.use((req, res, next) => {
 
 app.use(requestLogger);
 app.use(routes);
-app.use(cors());
 app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);
