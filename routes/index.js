@@ -5,7 +5,7 @@ const users = require("./users");
 const { login, createUser } = require("../controllers/users");
 const { authorize } = require("../middlewares/auth");
 const {
-  validatedUserLogin,
+  validateUserLogin,
   validateUserBody,
 } = require("../middlewares/validation");
 const NotFoundError = require("../utils/not-found-error");
@@ -13,7 +13,7 @@ const NotFoundError = require("../utils/not-found-error");
 router.use("/items", clothingItem);
 router.use("/users", authorize, users);
 
-router.post("/signin", validatedUserLogin, login);
+router.post("/signin", validateUserLogin, login);
 router.post("/signup", validateUserBody, createUser);
 
 router.use((req, res, next) => {
