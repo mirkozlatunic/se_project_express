@@ -10,25 +10,15 @@ const { errors } = require("celebrate");
 const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
-mongoose.connect(
-  "mongodb://127.0.0.1:27017/wtwr_db",
-  (r) => {
-    console.log("connected to DB", r);
-  },
-  (e) => console.log("DB error", e),
-);
+mongoose
+  .connect("mongodb://127.0.0.1:27017/wtwr_db")
+  .then(() => console.log("connected to DB"))
+  .catch((e) => console.log("DB error", e));
 app.use(cors());
 app.use(express.json());
 const routes = require("./routes");
 
 app.use(helmet());
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: "6514eed45b23e9679f955231", // paste the _id of the test user created in the previous step
-  };
-  next();
-});
 
 app.use(requestLogger);
 app.use(routes);

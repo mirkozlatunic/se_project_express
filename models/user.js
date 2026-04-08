@@ -26,12 +26,14 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    require: true,
+    required: true,
     unique: true,
-    validator(value) {
-      return validator.isURL(value);
+    validate: {
+      validator(value) {
+        return validator.isEmail(value);
+      },
+      message: "email is invalid",
     },
-    message: "email is invalid or already exists",
   },
 });
 

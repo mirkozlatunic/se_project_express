@@ -35,10 +35,10 @@ const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email) {
-    next(new BadRequestError("Error from createUser"));
+    return next(new BadRequestError("Error from createUser"));
   }
 
-  User.findOne({ email })
+  return User.findOne({ email })
     .then((user) => {
       if (user) {
         return next(new ConflictError("Email already exists"));
@@ -102,7 +102,7 @@ const updateProfile = (req, res, next) => {
         next(new NotFoundError("Error from getUser"));
       } else if (e.name === "CastError") {
         next(new BadRequestError("Error from getUser"));
-      } else if (e.name === "ValdiationError") {
+      } else if (e.name === "ValidationError") {
         next(new BadRequestError("invalid data"));
       } else {
         next(e);

@@ -43,7 +43,7 @@ const deleteItem = (req, res, next) => {
           new ForbiddenError("You are not authorized to delete this item"),
         );
       }
-      return ClothingItem.findByIdAndRemove(itemId)
+      return ClothingItem.findByIdAndDelete(itemId)
         .orFail()
         .then((removedItem) => res.send(removedItem));
     })
