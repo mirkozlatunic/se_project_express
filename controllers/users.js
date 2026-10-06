@@ -1,18 +1,9 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
-// const {
-//   UNAUTHORIZED,
-//   CREATED,
-//   BAD_REQUEST,
-//   FORBIDDEN,
-//   OK,
-//   handleHttpError,
-// } = require("../utils/errors");
 const { SECRET_KEY } = require("../utils/config");
 const BadRequestError = require("../utils/bad-request-error");
 const ConflictError = require("../utils/conflict-error");
-// const ForbiddenError = require("../utils/forbidden-error");
 const NotFoundError = require("../utils/not-found-error");
 const UnauthorizedError = require("../utils/unauthorized-error");
 
@@ -26,45 +17,42 @@ const login = (req, res, next) => {
 
       res.send({ token });
     })
-    .catch(() => {
-      next(new UnauthorizedError("Error from signinUser"));
+    .catch((e) => {
+      if (e.message === "Username or password are incorrect") {
+        next(new UnauthorizedError("Incorrect email or password"));
+      } else {
+        next(e);
+      }
     });
 };
 
 const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
-  if (!email) {
-    return next(new BadRequestError("Error from createUser"));
-  }
-
   return User.findOne({ email })
     .then((user) => {
       if (user) {
-        return next(new ConflictError("Email already exists"));
+        throw new ConflictError("Email already exists");
       }
 
-      return bcrypt.hash(password, 10).then((hash) => {
-        User.create({ name, avatar, email, password: hash })
-          .then((newUser) => {
-            res.status(200).send({
-              name: newUser.name,
-              email: newUser.email,
-              avatar: newUser.avatar,
-            });
-          })
-          .catch((e) => {
-            console.error(e);
-            if (e.name === "ValidationError") {
-              next(new BadRequestError("Error from createUser"));
-            } else {
-              next(e);
-            }
-          });
+      return bcrypt.hash(password, 10);
+    })
+    .then((hash) => User.create({ name, avatar, email, password: hash }))
+    .then((newUser) => {
+      res.status(201).send({
+        name: newUser.name,
+        email: newUser.email,
+        avatar: newUser.avatar,
       });
     })
     .catch((e) => {
-      next(e);
+      if (e.code === 11000) {
+        next(new ConflictError("Email already exists"));
+      } else if (e.name === "ValidationError") {
+        next(new BadRequestError("Error from createUser"));
+      } else {
+        next(e);
+      }
     });
 };
 
@@ -94,6 +82,7 @@ const updateProfile = (req, res, next) => {
     { name, avatar },
     { new: true, runValidators: true },
   )
+    .orFail()
     .then((user) => {
       res.send({ data: user });
     })
