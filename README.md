@@ -43,7 +43,17 @@ to refresh itself whenever source code is changed.
 
 ### Testing
 
-Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+`npm test` — run the Jest test suite (no local MongoDB needed; an in-memory instance is used)
+
+`npm run test:coverage` — run the tests with a coverage report
+
+`npm run lint` — run ESLint
+
+### Environment variables
+
+- `JWT_SECRET` — token signing secret (required when `NODE_ENV=production`)
+- `MONGODB_URI` — defaults to `mongodb://127.0.0.1:27017/wtwr_db`
+- `PORT` — defaults to `3001`
 
 ## Frontend Repository Link:
 

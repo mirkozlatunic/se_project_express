@@ -8,20 +8,21 @@ WTWR (What to Wear?) back-end — an Express.js REST API for a clothing recommen
 
 ## Commands
 
-- `npm run start` — start the server (`node app.js`)
-- `npm run dev` — start with hot reload (`nodemon app.js`)
-- `npm run lint` — run ESLint (`npx eslint .`)
-- No test suite is configured
+- `npm run start` — start the server (`node server.js`)
+- `npm run dev` — start with hot reload (`nodemon server.js`)
+- `npm run lint` — run ESLint
+- `npm test` — run Jest (unit + Supertest integration tests); `npm run test:coverage` adds coverage
+- Tests use `mongodb-memory-server` (no local MongoDB needed) and run with `--experimental-vm-modules` because `celebrate` is ESM-only
 
 ## Prerequisites
 
-- MongoDB must be running locally at `mongodb://127.0.0.1:27017/wtwr_db`
+- MongoDB must be running for `npm start` (default `mongodb://127.0.0.1:27017/wtwr_db`, override with `MONGODB_URI`)
 - Server runs on port 3001 by default (configurable via `PORT` env var)
-- `JWT_SECRET` env var can be set via `.env` file (falls back to `"JWT_SECRET"` string)
+- `JWT_SECRET` env var (via `.env`) signs tokens; required when `NODE_ENV=production`, otherwise falls back to a dev secret
 
 ## Architecture
 
-**Entry point:** `app.js` — sets up Express with CORS, Helmet, JSON parsing, Winston logging, Celebrate validation errors, and a centralized error handler.
+**Entry points:** `app.js` builds and exports the Express app (CORS, Helmet, JSON parsing, Winston logging, Celebrate validation errors, centralized error handler) with no side effects, so tests can import it. `server.js` connects to MongoDB and calls `listen()`.
 
 **Routing flow:** `routes/index.js` is the main router.
 - `/signup` (POST) and `/signin` (POST) are public (validated with Celebrate)
@@ -31,7 +32,7 @@ WTWR (What to Wear?) back-end — an Express.js REST API for a clothing recommen
 
 **Error handling:** Custom error classes in `utils/` (BadRequestError, ConflictError, ForbiddenError, NotFoundError, UnauthorizedError) each set a `statusCode`. The centralized `middlewares/error-handler.js` reads `err.statusCode` and returns JSON. Celebrate's `errors()` middleware handles validation errors before the custom handler.
 
-**Auth:** JWT Bearer tokens, signed with `SECRET_KEY` from `utils/config.js`, 7-day expiry. Password hashing with bcrypt. The `authorize` middleware extracts the user ID from the token into `req.user._id`.
+**Auth:** JWT Bearer tokens, signed with `SECRET_KEY` from `utils/config.js` (sourced from `JWT_SECRET`), 7-day expiry. Password hashing with bcrypt. The `authorize` middleware extracts the user ID from the token into `req.user._id`.
 
 **Models (Mongoose):**
 - `user` — name, avatar (URL), email (unique), password (select: false). Has static `findUserByCredentials` for login.
